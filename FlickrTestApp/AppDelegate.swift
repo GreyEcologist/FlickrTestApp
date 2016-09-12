@@ -7,17 +7,13 @@
 //
 
 import UIKit
-import FlickrKit
 
 @UIApplicationMain
 final class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        FlickrKit.sharedFlickrKit().initializeWithAPIKey(Constants.kFlickrKey, sharedSecret: Constants.kFlickrSecret)
-        
         self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
         self.window!.rootViewController = ViewController()
         self.window!.backgroundColor = UIColor.whiteColor()

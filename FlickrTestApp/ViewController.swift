@@ -29,6 +29,8 @@ final class ViewController: UIViewController, ASTableViewDataSource, ASTableView
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        FlickrViewModel().getInterestingListSignal().start()
+        
         self.flickrTableView.frame = Constants.kFlickrTableViewRect
         self.flickrTableView.asyncDataSource = self
         self.flickrTableView.asyncDelegate = self
@@ -76,18 +78,16 @@ final class ViewController: UIViewController, ASTableViewDataSource, ASTableView
         })
     }
     
-    //MARK: UISearchBarDelegate
-    func searchBarCancelButtonClicked(searchBar: UISearchBar) { self.hideSearchBar() }
-    func searchBarShouldBeginEditing(searchBar: UISearchBar) -> Bool { return true }
     
+    //MARK: UISearchBarDelegate
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText.characters.count > 2 {
         }
     }
     
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) { self.hideSearchBar() }
+    func searchBarShouldBeginEditing(searchBar: UISearchBar) -> Bool { return true }
     func searchBarTextDidEndEditing(searchBar: UISearchBar) { searchBar.resignFirstResponder() }
-    
     func searchBarSearchButtonClicked(searchBar: UISearchBar) { searchBar.resignFirstResponder() }
-
 }
 
