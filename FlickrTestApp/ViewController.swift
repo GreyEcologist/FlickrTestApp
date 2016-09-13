@@ -34,13 +34,14 @@ final class ViewController: UIViewController, ASTableViewDataSource, ASTableView
         self.flickrTableView.asyncDataSource = self
         self.flickrTableView.asyncDelegate = self
         self.flickrTableView.separatorStyle = .None
-        self.flickrTableView.backgroundColor = UIColor.blackColor()
+        self.flickrTableView.backgroundColor = UIColor.whiteColor()
         
         self.searchBar.delegate = self
         self.searchBar.searchBarStyle = .Minimal
         self.showSearchBar()
         
         self.view.addSubview(self.flickrTableView)
+        self.view.addSubview(self.searchBar)
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -67,28 +68,36 @@ final class ViewController: UIViewController, ASTableViewDataSource, ASTableView
         return FlickrCell(imageURL: flickrArray[indexPath.row])
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {}
-    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        self.imageTapped(indexPath.row)
+    }
     
     func showSearchBar() {
-        guard self.view.subviews.contains(self.searchBar) == false else { return hideSearchBar() }
         self.searchBar.alpha = 0.0
         UIView.animateWithDuration(0.5, animations: {
             self.searchBar.alpha = 1.0
             self.searchBar.showsCancelButton = true
-            self.searchBar.tintColor = UIColor.whiteColor()
-            self.searchBar.barTintColor = UIColor.whiteColor()
+            self.searchBar.tintColor = UIColor.blackColor()
+            self.searchBar.barTintColor = UIColor.blackColor()
             self.searchBar.frame = Constants.kSearchRect
-            self.view.addSubview(self.searchBar)
             self.searchBar.endEditing(true)
             }, completion: { _ in self.searchBar.becomeFirstResponder() })
     }
     
-    func hideSearchBar() {
-        UIView.animateWithDuration(0.3, animations: {
-            self.searchBar.alpha = 0 }, completion: { _ in self.searchBar.removeFromSuperview()
-        })
+    
+    //MARK: Full Screen
+    func imageTapped(index: Int) {
+        let newImageView = UIImageView(image: UIImage(data: NSData(contentsOfURL: flickrArray[index])!))
+        newImageView.frame = self.view.frame
+        newImageView.backgroundColor = .blackColor()
+        newImageView.contentMode = .ScaleAspectFit
+        newImageView.userInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(ViewController.dismissFullscreenImage(_:)))
+        newImageView.addGestureRecognizer(tap)
+        self.view.addSubview(newImageView)
     }
+    
+    func dismissFullscreenImage(sender: UITapGestureRecognizer) { sender.view?.removeFromSuperview() }
     
     
     //MARK: UISearchBarDelegate
@@ -97,8 +106,8 @@ final class ViewController: UIViewController, ASTableViewDataSource, ASTableView
         }
     }
     
-    func searchBarCancelButtonClicked(searchBar: UISearchBar) { self.hideSearchBar() }
     func searchBarShouldBeginEditing(searchBar: UISearchBar) -> Bool { return true }
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) { searchBar.resignFirstResponder() }
     func searchBarTextDidEndEditing(searchBar: UISearchBar) { searchBar.resignFirstResponder() }
     func searchBarSearchButtonClicked(searchBar: UISearchBar) { searchBar.resignFirstResponder() }
 }
