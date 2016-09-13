@@ -31,8 +31,8 @@ import enum Result.NoError
 	/// send its initial value then all changes over time, and then complete
 	/// when the observed object has deallocated.
 	///
-	/// - important: This only works if the object given to init() is KVO-compliant.
-	///              Most UI controls are not!
+	/// By definition, this only works if the object given to init() is
+	/// KVO-compliant. Most UI controls are not!
 	public var producer: SignalProducer<AnyObject?, NoError> {
 		return property?.producer ?? .empty
 	}
@@ -42,19 +42,13 @@ import enum Result.NoError
 	}
 
 	/// Initializes a property that will observe and set the given key path of
-	/// the given object.
-	///
-	/// - important: `object` must support weak references!
-	///
-	/// - parameters:
-	///   - object: An object to be observed.
-	///   - keyPath: Key path to observe on the object.
+	/// the given object. `object` must support weak references!
 	public init(object: NSObject?, keyPath: String) {
 		self.object = object
 		self.keyPath = keyPath
 		self.property = MutableProperty(nil)
 
-		/// A DynamicProperty will stay alive as long as its object is alive.
+		/// DynamicProperty stay alive as long as object is alive.
 		/// This is made possible by strong reference cycles.
 		super.init()
 

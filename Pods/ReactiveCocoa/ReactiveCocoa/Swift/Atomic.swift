@@ -13,7 +13,7 @@ public final class Atomic<Value> {
 	private var mutex = pthread_mutex_t()
 	private var _value: Value
 	
-	/// Atomically get or set the value of the variable.
+	/// Atomically gets or sets the value of the variable.
 	public var value: Value {
 		get {
 			return withValue { $0 }
@@ -24,10 +24,7 @@ public final class Atomic<Value> {
 		}
 	}
 	
-	/// Initialize the variable with the given initial value.
-	/// 
-	/// - parameters:
-	///   - value: Initial value for `self`.
+	/// Initializes the variable with the given initial value.
 	public init(_ value: Value) {
 		_value = value
 		let result = pthread_mutex_init(&mutex, nil)
@@ -49,22 +46,16 @@ public final class Atomic<Value> {
 		assert(result == 0, "Failed to unlock \(self) with error \(result).")
 	}
 	
-	/// Atomically replace the contents of the variable.
+	/// Atomically replaces the contents of the variable.
 	///
-	/// - parameters:
-	///   - newValue: A new value for the variable.
-	///
-	/// - returns: The old value.
+	/// Returns the old value.
 	public func swap(newValue: Value) -> Value {
 		return modify { _ in newValue }
 	}
 
-	/// Atomically modify the variable.
+	/// Atomically modifies the variable.
 	///
-	/// - parameters:
-	///   - action: A closure that takes the current value.
-	///
-	/// - returns: The old value.
+	/// Returns the old value.
 	public func modify(@noescape action: (Value) throws -> Value) rethrows -> Value {
 		return try withValue { value in
 			_value = try action(value)
@@ -72,13 +63,10 @@ public final class Atomic<Value> {
 		}
 	}
 	
-	/// Atomically perform an arbitrary action using the current value of the
+	/// Atomically performs an arbitrary action using the current value of the
 	/// variable.
 	///
-	/// - parameters:
-	///   - action: A closure that takes the current value.
-	///
-	/// - returns: The result of the action.
+	/// Returns the result of the action.
 	public func withValue<Result>(@noescape action: (Value) throws -> Result) rethrows -> Result {
 		lock()
 		defer { unlock() }

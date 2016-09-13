@@ -6,7 +6,8 @@
 //  Copyright © 2016 Gareth.K.Mensah. All rights reserved.
 //
 
-import Foundation
+import UIKit
+import ReactiveCocoa
 import AsyncDisplayKit
 
 final class ViewController: UIViewController, ASTableViewDataSource, ASTableViewDelegate, UISearchBarDelegate {
@@ -14,6 +15,7 @@ final class ViewController: UIViewController, ASTableViewDataSource, ASTableView
     //MARK: Properties
     private let searchBar: UISearchBar
     private let flickrTableView: ASTableView
+    internal var flickrArray: [NSURL] = []
     
     //MARK: Initializers
     required init(coder aDecoder: NSCoder) { fatalError("storyboards are incompatible with truth and beauty") }
@@ -28,9 +30,6 @@ final class ViewController: UIViewController, ASTableViewDataSource, ASTableView
     //MARK: Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        FlickrViewModel().getInterestingListSignal().start()
-        
         self.flickrTableView.frame = Constants.kFlickrTableViewRect
         self.flickrTableView.asyncDataSource = self
         self.flickrTableView.asyncDelegate = self
@@ -44,19 +43,32 @@ final class ViewController: UIViewController, ASTableViewDataSource, ASTableView
         self.view.addSubview(self.flickrTableView)
     }
     
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        FlickrViewModel().getInterestingListSignal()
+            .observeOn(UIScheduler())
+            .on(next: { collection in
+                self.flickrTableView.beginUpdates()
+                self.flickrArray = collection as! Array<NSURL>
+                self.flickrTableView.reloadData()
+                self.flickrTableView.endUpdates()
+            })
+            .start()
+    }
+    
     
     //MARK: ASTableView methods
     func numberOfSectionsInTableView(tableView: UITableView) -> Int { return 1 }
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int { return 0 }
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int { return flickrArray.count }
     
     func tableView(tableView: ASTableView, nodeForRowAtIndexPath indexPath: NSIndexPath) -> ASCellNode {
-        let node: ASCellNode = ASCellNode()
-        return node
+        print(flickrArray[indexPath.row].absoluteString)
+        return FlickrCell(imageURL: flickrArray[indexPath.row])
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        //
-    }
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {}
+    
     
     func showSearchBar() {
         guard self.view.subviews.contains(self.searchBar) == false else { return hideSearchBar() }

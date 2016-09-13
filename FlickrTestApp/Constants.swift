@@ -17,5 +17,5 @@ struct Constants {
     static let kStatusViewRect: CGRect = CGRect(x: 0, y: 0, width: kScreenWidth, height: 20)
     static let kSearchRect: CGRect = CGRect(x: kPadding, y: kStatusViewRect.height + kPadding, width: kScreenWidth, height: 48)
     static let kTablePositionY: CGFloat = kSearchRect.height + kSearchRect.origin.y
-    static let kFlickrTableViewRect: CGRect = CGRect(x: kPadding, y: kTablePositionY + kPadding, width: kScreenWidth - 2 * kPadding, height: kScreenHeight - (kTablePositionY + 2 * kPadding))
+    static let kFlickrTableViewRect: CGRect = CGRect(x: kPadding, y: kTablePositionY + kPadding, width: kScreenWidth - 2 * kPadding, height: kScreenHeight - 2 * kPadding)
 }
