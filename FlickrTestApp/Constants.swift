@@ -11,6 +11,7 @@ import UIKit
 struct Constants {
     static let kFlickrKey: String = "efa44569d964ac57f4cc5bbd3e77d2fd"
     static let kFlickrSecret: String = "a0a3689d555f734c"
+    static let kFlickrUser: String = "GreyEcologist"
     static let kPadding: CGFloat = 5.0
     static let kScreenWidth: CGFloat = UIScreen.mainScreen().bounds.width
     static let kScreenHeight: CGFloat = UIScreen.mainScreen().bounds.height

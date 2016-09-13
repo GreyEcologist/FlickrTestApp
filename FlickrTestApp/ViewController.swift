@@ -46,14 +46,15 @@ final class ViewController: UIViewController, ASTableViewDataSource, ASTableView
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        
+        self.defaultSearch()
+    }
+    
+    func defaultSearch() {
         FlickrViewModel().getInterestingListSignal()
             .observeOn(UIScheduler())
             .on(next: { collection in
-                self.flickrTableView.beginUpdates()
                 self.flickrArray = collection as! Array<NSURL>
                 self.flickrTableView.reloadData()
-                self.flickrTableView.endUpdates()
             })
             .start()
     }
@@ -64,7 +65,6 @@ final class ViewController: UIViewController, ASTableViewDataSource, ASTableView
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int { return flickrArray.count }
     
     func tableView(tableView: ASTableView, nodeForRowAtIndexPath indexPath: NSIndexPath) -> ASCellNode {
-        print(flickrArray[indexPath.row].absoluteString)
         return FlickrCell(imageURL: flickrArray[indexPath.row])
     }
     
@@ -87,6 +87,7 @@ final class ViewController: UIViewController, ASTableViewDataSource, ASTableView
     
     //MARK: Full Screen
     func imageTapped(index: Int) {
+        self.flickrTableView.deselectRowAtIndexPath(NSIndexPath(forRow: index, inSection: 0), animated: true)
         let newImageView = UIImageView(image: UIImage(data: NSData(contentsOfURL: flickrArray[index])!))
         newImageView.frame = self.view.frame
         newImageView.backgroundColor = .blackColor()
@@ -97,17 +98,26 @@ final class ViewController: UIViewController, ASTableViewDataSource, ASTableView
         self.view.addSubview(newImageView)
     }
     
-    func dismissFullscreenImage(sender: UITapGestureRecognizer) { sender.view?.removeFromSuperview() }
+    func dismissFullscreenImage(sender: UITapGestureRecognizer) {
+        sender.view?.removeFromSuperview()
+    }
     
     
     //MARK: UISearchBarDelegate
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText.characters.count > 2 {
-        }
+            FlickrViewModel().searchSignal(searchToken: searchText)
+                .observeOn(UIScheduler())
+                .on(next: { collection in
+                    self.flickrArray = collection as! Array<NSURL>
+                    self.flickrTableView.reloadData()
+                })
+                .start()
+        } else { self.defaultSearch() }
     }
     
     func searchBarShouldBeginEditing(searchBar: UISearchBar) -> Bool { return true }
-    func searchBarCancelButtonClicked(searchBar: UISearchBar) { searchBar.resignFirstResponder() }
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) { self.defaultSearch(); searchBar.resignFirstResponder() }
     func searchBarTextDidEndEditing(searchBar: UISearchBar) { searchBar.resignFirstResponder() }
     func searchBarSearchButtonClicked(searchBar: UISearchBar) { searchBar.resignFirstResponder() }
 }
